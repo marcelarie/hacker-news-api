@@ -35,11 +35,31 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import axios from 'axios';
+function formatter(response, regex, result) {
+    if (result === void 0) { result = []; }
+    var post = {};
+    var _loop_1 = function (expression) {
+        var matches = response.data.match(regex[expression]);
+        matches.forEach(function (itemMatch) {
+            if (expression === 'link') {
+                console.log(itemMatch);
+                var separatedIetem = itemMatch.split('"');
+                post.title = separatedIetem[4].slice(1, -4);
+                post[expression] = separatedIetem[1];
+            }
+        });
+        result.push(post);
+    };
+    for (var expression in regex) {
+        _loop_1(expression);
+    }
+    return result;
+}
 function crawler(page, mode) {
     if (page === void 0) { page = 1; }
     if (mode === void 0) { mode = 'news?p'; }
     return __awaiter(this, void 0, void 0, function () {
-        var host, response, formatted, error_1;
+        var host, response, regularExpressions, formatted, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -48,7 +68,16 @@ function crawler(page, mode) {
                     return [4 /*yield*/, axios.get(host + mode + page)];
                 case 1:
                     response = _a.sent();
-                    formatted = response.data.match(/<a[\s]+([^>]+)>((?:.(?!\<\/a\>))*.)<\/a>/g);
+                    regularExpressions = {
+                        link: /<a[\s]+([^>]+)class="storylink">((?:.(?!\<\/a\>))*.)<\/a>/g,
+                        score: /<span class="score"(.*?)<\/span>/g,
+                        user: /<a[\s]+([^>]+)class="hnuser">((?:.(?!\<\/a\>))*.)<\/a>/g,
+                        age: /<span class="age"(.*?)<\/span>/g,
+                    };
+                    formatted = formatter(response, regularExpressions);
+                    // while (formatted !== null) {
+                    //     console.log(formatted[2]);
+                    // }
                     return [2 /*return*/, formatted];
                 case 2:
                     error_1 = _a.sent();

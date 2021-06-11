@@ -46,9 +46,8 @@ export function getByPage(req, res) {
                 case 1:
                     response = _b.sent();
                     if (!response) {
-                        return [2 /*return*/, res.status(404).send({ data: null, message: response })];
+                        return [2 /*return*/, res.status(404).send({ data: null, message: "Can't connect to Hacker News" })];
                     }
-                    console.log(response);
                     return [2 /*return*/, res.status(200).send(response)];
                 case 2:
                     _a = _b.sent();
