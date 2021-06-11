@@ -6,7 +6,9 @@ export async function getByPage(req: Request, res: Response) {
         const response = await crawler();
 
         if (!response) {
-            return res.status(404).send({ data: null, message: "Can't connect to Hacker News" });
+            return res
+                .status(404)
+                .send({ data: null, message: "Can't connect to Hacker News" });
         }
 
         return res.status(200).send(response);

@@ -44,9 +44,11 @@ function formatter(response, result) {
         rank: /<span class="rank"(.*?)<\/span>/g,
         author: /<a href="user(.*?)class="hnuser(.*?)<\/a>/,
         site: /<span class="sitestr"(.*?)<\/span>/g,
-        link: /<a(.*?) class="storylink"(.*?)<\/a>/g,
-        score: /<span(.*?)class="score"(.*?)<\/span>/g,
+        title: /class="storylink"(.*?)<\/a>/g,
+        link: /<td class="title"><a href="(.*?)>/g,
+        score: /<span class="score"(.*?)<\/span>/g,
         age: /<span class="age"(.*?)<\/span>/g,
+        comments: /<a href="item(.*?)&nbsp;comments<\/a>/g, //❌
     };
     var generalMatch = {
         athings: trimmedData.match(regularExpressions.athing),
@@ -59,40 +61,21 @@ function formatter(response, result) {
     });
     allGeneralMatches.forEach(function (item) {
         var post = {};
-        // ranks: array.match(regularExpressions.rank),
-        var author = item.match(regularExpressions.author)[0];
-        post.author = author;
-        console.log(author);
-        // sites: array.match(regularExpressions.site),
-        // links: array.match(regularExpressions.link),
-        // scores: array.match(regularExpressions.score),
-        // ages: array.match(regularExpressions.age),
+        post.rank = item.match(regularExpressions.rank)[0];
+        post.title = item.match(regularExpressions.title)[0];
+        post.link = item.match(regularExpressions.link)[0];
+        post.author = item.match(regularExpressions.author)[0];
+        // post.site = item.match(regularExpressions.site)![0];
+        post.score = item.match(regularExpressions.score)[0];
+        post.age = item.match(regularExpressions.age)[0];
+        // post.comments = item.match(regularExpressions.comments)![0];
         result.push(post);
     });
-    //     generalMatch.athings.forEach((item: string) => {
-    //         const post: PostType = {};
-    //         const separatedIetem = item.split('"');
-    //         console.log(separatedIetem);
-    //         post.title = separatedIetem[4].slice(1, -4);
-    //         post.link = separatedIetem[1];
-    //         item.match(regularExpressions.link);
-    //     });
-    //
-    //     return result;
-    // console.log(generalMatch.athings.length);
-    // console.log(generalMatch.subtexts.length);
-    // console.log(matchList.ranks.length);
-    // const authors = matchList(generalMatch);
-    // console.log(authors);
-    // console.log(matchList.sites.length);
-    // console.log(matchList.links.length);
-    // console.log(matchList.scores.length);
-    // console.log(matchList.ages.length);
     return result;
 }
 function crawler(page, mode) {
     if (page === void 0) { page = 1; }
-    if (mode === void 0) { mode = 'news?p'; }
+    if (mode === void 0) { mode = 'news?p='; }
     return __awaiter(this, void 0, void 0, function () {
         var host, response, formatted, error_1;
         return __generator(this, function (_a) {
