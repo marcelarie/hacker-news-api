@@ -5,7 +5,7 @@
     "repository": "git@github.com:marcelarie/hacker-news-api.git",
     "type": "module",
     "scripts": {
-        "start": "ts-node build/index.js",
+        "start": "nodemon build/index.js",
         "dev": "ts-node-dev build/index.js"
     },
     "author": "Marcel Arie <googlillo@gmail.com>",

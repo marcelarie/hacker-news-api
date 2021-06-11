@@ -35,31 +35,66 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import axios from 'axios';
-function formatter(response, regex, result) {
+function formatter(response, result) {
     if (result === void 0) { result = []; }
-    var post = {};
-    var _loop_1 = function (expression) {
-        var matches = response.data.match(regex[expression]);
-        matches.forEach(function (itemMatch) {
-            if (expression === 'link') {
-                console.log(itemMatch);
-                var separatedIetem = itemMatch.split('"');
-                post.title = separatedIetem[4].slice(1, -4);
-                post[expression] = separatedIetem[1];
-            }
-        });
-        result.push(post);
+    var trimmedData = response.data.replace(/(\r\n|\n|\r)/gm, '');
+    var regularExpressions = {
+        athing: /<tr(.*?)class='athing'(.*?)<\/tr>/g,
+        subtext: /<td class=('|")subtext('|")(.*?)<\/td>/g,
+        rank: /<span class="rank"(.*?)<\/span>/g,
+        author: /<a href="user(.*?)class="hnuser(.*?)<\/a>/,
+        site: /<span class="sitestr"(.*?)<\/span>/g,
+        link: /<a(.*?) class="storylink"(.*?)<\/a>/g,
+        score: /<span(.*?)class="score"(.*?)<\/span>/g,
+        age: /<span class="age"(.*?)<\/span>/g,
     };
-    for (var expression in regex) {
-        _loop_1(expression);
-    }
+    var generalMatch = {
+        athings: trimmedData.match(regularExpressions.athing),
+        subtexts: trimmedData.match(regularExpressions.subtext),
+    };
+    var count = 0;
+    var allGeneralMatches = generalMatch.athings.map(function (item) {
+        count++;
+        return item.concat(generalMatch.subtexts[count]);
+    });
+    allGeneralMatches.forEach(function (item) {
+        var post = {};
+        // ranks: array.match(regularExpressions.rank),
+        var author = item.match(regularExpressions.author)[0];
+        post.author = author;
+        console.log(author);
+        // sites: array.match(regularExpressions.site),
+        // links: array.match(regularExpressions.link),
+        // scores: array.match(regularExpressions.score),
+        // ages: array.match(regularExpressions.age),
+        result.push(post);
+    });
+    //     generalMatch.athings.forEach((item: string) => {
+    //         const post: PostType = {};
+    //         const separatedIetem = item.split('"');
+    //         console.log(separatedIetem);
+    //         post.title = separatedIetem[4].slice(1, -4);
+    //         post.link = separatedIetem[1];
+    //         item.match(regularExpressions.link);
+    //     });
+    //
+    //     return result;
+    // console.log(generalMatch.athings.length);
+    // console.log(generalMatch.subtexts.length);
+    // console.log(matchList.ranks.length);
+    // const authors = matchList(generalMatch);
+    // console.log(authors);
+    // console.log(matchList.sites.length);
+    // console.log(matchList.links.length);
+    // console.log(matchList.scores.length);
+    // console.log(matchList.ages.length);
     return result;
 }
 function crawler(page, mode) {
     if (page === void 0) { page = 1; }
     if (mode === void 0) { mode = 'news?p'; }
     return __awaiter(this, void 0, void 0, function () {
-        var host, response, regularExpressions, formatted, error_1;
+        var host, response, formatted, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -68,16 +103,7 @@ function crawler(page, mode) {
                     return [4 /*yield*/, axios.get(host + mode + page)];
                 case 1:
                     response = _a.sent();
-                    regularExpressions = {
-                        link: /<a[\s]+([^>]+)class="storylink">((?:.(?!\<\/a\>))*.)<\/a>/g,
-                        score: /<span class="score"(.*?)<\/span>/g,
-                        user: /<a[\s]+([^>]+)class="hnuser">((?:.(?!\<\/a\>))*.)<\/a>/g,
-                        age: /<span class="age"(.*?)<\/span>/g,
-                    };
-                    formatted = formatter(response, regularExpressions);
-                    // while (formatted !== null) {
-                    //     console.log(formatted[2]);
-                    // }
+                    formatted = formatter(response);
                     return [2 /*return*/, formatted];
                 case 2:
                     error_1 = _a.sent();
