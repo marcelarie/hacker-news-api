@@ -8,6 +8,7 @@ type RegexOnjectType = {
     [key: string]: RegExp;
 };
 
+// TODO: Modularize this function
 function formatter(response: AxiosResponse, result: Object[] = []) {
     const trimmedData = response.data.replace(/(\r\n|\n|\r)/gm, '');
 
@@ -77,7 +78,8 @@ function formatter(response: AxiosResponse, result: Object[] = []) {
 
     return result;
 }
-async function crawler(page = 1, mode = 'news?p=') {
+
+async function crawler(page = '1', mode = 'news?p=') {
     try {
         const host = 'https://news.ycombinator.com/';
         const response = await axios.get(host + mode + page);

@@ -1,14 +1,14 @@
 # hacker-news-api
 
-This is an API to get the last news from Hacker News. 
+This is an API to get the last news from Hacker News.
 
 ### TODOS
 
-1. Web crawler
-2. Process the data
+1. Web crawler ✅
+2. Process the data ✅
 3. Create the endpoints
-    - GET / -> page 1 of HN
-    - GET /2 -> page 2 of HN
+    - GET / -> page 1 of HN ✅
+    - GET /2 -> page 2 of HN ✅
 4. Re-test everything
 
 # BONUS

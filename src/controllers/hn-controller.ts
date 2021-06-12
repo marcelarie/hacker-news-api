@@ -2,8 +2,9 @@ import { Request, Response } from 'express';
 import crawler from '../crawler/index.js';
 
 export async function getByPage(req: Request, res: Response) {
+    const { page } = req.params;
     try {
-        const response = await crawler();
+        const response = await crawler(page);
 
         if (!response) {
             return res
