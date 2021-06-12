@@ -4,23 +4,32 @@ type PostType = {
     [key: string]: string;
 };
 
+type RegexOnjectType = {
+    [key: string]: RegExp;
+};
+
 function formatter(response: AxiosResponse, result: Object[] = []) {
     const trimmedData = response.data.replace(/(\r\n|\n|\r)/gm, '');
-    const regularExpressions = {
-        athing: /<tr(.*?)class='athing'(.*?)<\/tr>/g,
-        subtext: /<td class=('|")subtext('|")(.*?)<\/td>/g,
-        rank: /<span class="rank"(.*?)<\/span>/g, //✅
+
+    const regexMatcher = (item: string, regex: RegExp, type = 'Type') => {
+        return regex.test(item)
+            ? item.match(regex)![1]
+            : `${type.toUpperCase()} NOT FOUND (\´･_･\`)`;
+    };
+
+    const regularExpressions: RegexOnjectType = {
+        rank: /<span class="rank"(.*?)<\/span>/, //✅
         author: /<a href="user(.*?)class="hnuser(.*?)<\/a>/,
-        site: /<span class="sitestr"(.*?)<\/span>/g, // ❌
-        title: /class="storylink"(.*?)<\/a>/g, //✅
-        link: /<td class="title"><a href="(.*?)>/g, //✅
-        score: /<span class="score"(.*?)<\/span>/g, //✅
-        age: /<span class="age"(.*?)<\/span>/g, //✅
-        comments: /<a href="item(.*?)&nbsp;comments<\/a>/g, //❌
+        site: /<span class="sitestr"(.*?)<\/span>/, // ✅
+        title: /class="storylink"(.*?)<\/a>/, //✅
+        link: /<td class="title"><a href="(.*?)>/, //✅
+        score: /<span class="score"(.*?)<\/span>/, //✅
+        age: /<span class="age"(.*?)<\/span>/, //✅
+        comments: /([0-9]|[1-9][0-9]|[1-9][0-9][0-9])&nbsp;comments/, // TODO: Fix this
     };
     const generalMatch = {
-        athings: trimmedData.match(regularExpressions.athing),
-        subtexts: trimmedData.match(regularExpressions.subtext),
+        athings: trimmedData.match(/<tr(.*?)class='athing'(.*?)<\/tr>/g),
+        subtexts: trimmedData.match(/<td class=('|")subtext('|")(.*?)<\/td>/g),
     };
 
     let count = 0;
@@ -29,16 +38,40 @@ function formatter(response: AxiosResponse, result: Object[] = []) {
         return item.concat(generalMatch.subtexts[count]);
     });
 
+    const cleanResult = (post: PostType, key: string) => {
+        if (post[key].includes('NOT FOUND (´･_･`)')) return post[key];
+        switch (key) {
+            case 'rank':
+                post[key] = post[key].slice(1, -1);
+                break;
+            case 'author':
+                post[key] = post[key].slice(4, -2);
+                break;
+            case 'site':
+            case 'title':
+                post[key] = post[key].slice(1);
+                break;
+            case 'link':
+                post[key] = post[key].split('"')[0];
+                break;
+            case 'score':
+                post[key] = post[key].split('>')[1];
+                break;
+            case 'age':
+                post[key] = post[key].split('>')[2].slice(0, -3);
+                break;
+            default:
+                break;
+        }
+    };
+
     allGeneralMatches.forEach((item: string) => {
         const post: PostType = {};
-        post.rank = item.match(regularExpressions.rank)![0];
-        post.title = item.match(regularExpressions.title)![0];
-        post.link = item.match(regularExpressions.link)![0];
-        post.author = item.match(regularExpressions.author)![0];
-        // post.site = item.match(regularExpressions.site)![0];
-        post.score = item.match(regularExpressions.score)![0];
-        post.age = item.match(regularExpressions.age)![0];
-        // post.comments = item.match(regularExpressions.comments)![0];
+        for (const regex in regularExpressions) {
+            const currentRegex = regularExpressions[regex];
+            post[regex] = regexMatcher(item, currentRegex, regex);
+            cleanResult(post, regex);
+        }
         result.push(post);
     });
 
