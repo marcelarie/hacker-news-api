@@ -2,8 +2,16 @@ import { Request, Response } from 'express';
 import crawler from '../crawler';
 
 export async function getByPage(req: Request, res: Response) {
-    const { page } = req.params;
     try {
+        let { page } = req.params;
+        if (page === undefined) page = '1';
+        let numberPages = parseInt(page);
+        if (numberPages >= 5 || !numberPages)
+            return res.status(404).send({
+                data: null,
+                message: "Can't find this page at Hacker News",
+            });
+
         const response = await crawler(page);
 
         if (!response) {
@@ -13,7 +21,8 @@ export async function getByPage(req: Request, res: Response) {
         }
 
         return res.status(200).send(response);
-    } catch ({ message }) {
+    } catch ({ name, message }) {
+        console.log(name);
         res.status(500).send({ message });
     }
 }

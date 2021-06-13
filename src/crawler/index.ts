@@ -88,9 +88,6 @@ async function crawlerMultiCall(page: string, mode: string) {
 
     const urls = [];
     let numberPages = parseInt(page);
-    if (numberPages >= 5)
-        throw new Error("Can't find this page at Hacker News");
-
     for (let index = 0; index < numberPages; index++) {
         urls.push(host + mode + (index + 1));
     }
@@ -102,7 +99,7 @@ async function crawlerMultiCall(page: string, mode: string) {
     });
 
     // TODO: Handle errors
-    const data: string[] = await Promise.all(responses);
+    const data: string[] = await axios.all(responses);
     return data;
 }
 
