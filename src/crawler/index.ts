@@ -9,8 +9,8 @@ type RegexOnjectType = {
 };
 
 // TODO: Modularize this function
-function formatter(response: AxiosResponse, result: Object[] = []) {
-    const trimmedData = response.data.replace(/(\r\n|\n|\r)/gm, '');
+function formatter(data: string[], result: Object[] = []) {
+    const trimmedData = data.join('').replace(/(\r\n|\n|\r)/gm, '');
 
     const regexMatcher = (item: string, regex: RegExp, type = 'Type') => {
         return regex.test(item)
@@ -29,16 +29,14 @@ function formatter(response: AxiosResponse, result: Object[] = []) {
         comments: /([0-9]|[1-9][0-9]|[1-9][0-9][0-9])&nbsp;comments/, // TODO: Fix this
     };
     const generalMatch = {
-        athings: trimmedData.match(/<tr(.*?)class='athing'(.*?)<\/tr>/g),
-        subtexts: trimmedData.match(/<td class=('|")subtext('|")(.*?)<\/td>/g),
+        athings: trimmedData.match(/<tr(.*?)class='athing'(.*?)<\/tr>/g)!,
+        subtexts: trimmedData.match(/<td class=('|")subtext('|")(.*?)<\/td>/g)!,
     };
 
-    let count = 0;
-    const allGeneralMatches = generalMatch.subtexts.map((item: string) => {
-        const match = item.concat(generalMatch.athings[count]);
-        count++;
-        return match;
-    });
+    const allGeneralMatches = generalMatch.subtexts.map(
+        (item: string, index: number) =>
+            item.concat(generalMatch.athings[index])
+    );
 
     const cleanResult = (post: PostType, key: string) => {
         if (post[key].includes('NOT FOUND (´･_･`)')) return post[key];
@@ -83,9 +81,24 @@ function formatter(response: AxiosResponse, result: Object[] = []) {
 async function crawler(page = '1', mode = 'news?p=') {
     try {
         const host = 'https://news.ycombinator.com/';
-        const response = await axios.get(host + mode + page);
 
-        const formatted = formatter(response);
+        const urls = [];
+        let numberPages = parseInt(page);
+        if (numberPages >= 5)
+            throw new Error("Can't find this page at Hacker News");
+
+        for (let index = 0; index < numberPages; index++) {
+            urls.push(host + mode + (index + 1));
+        }
+
+        const responses = urls.map(async url => {
+            const response = await axios.get(url);
+            return response.data;
+        });
+
+        const data: string[] = await Promise.all(responses);
+
+        const formatted = formatter(data);
 
         return formatted;
     } catch (error) {
