@@ -35,8 +35,7 @@ function cleanResult(post: PostType, key: string) {
     }
 }
 
-// TODO: Modularize this function
-function formatter(data: string[], result: Object[] = []) {
+function postsGeneretor(data: string[], result: Object[] = []) {
     const trimmedData = data.join('').replace(/(\r\n|\n|\r)/gm, '');
 
     const regexMatcher = (item: string, regex: RegExp, type = 'Type') => {
@@ -97,10 +96,12 @@ async function crawlerMultiCall(page: string, mode: string) {
     }
 
     const responses = urls.map(async url => {
+        // TODO: Handle errors
         const response = await axios.get(url);
         return response.data;
     });
 
+    // TODO: Handle errors
     const data: string[] = await Promise.all(responses);
     return data;
 }
@@ -108,9 +109,9 @@ async function crawlerMultiCall(page: string, mode: string) {
 async function crawler(page = '1', mode = 'news?p=') {
     try {
         const data = await crawlerMultiCall(page, mode);
-        const formatted = formatter(data);
+        const posts = postsGeneretor(data);
 
-        return formatted;
+        return posts;
     } catch (error) {
         return error.message;
     }

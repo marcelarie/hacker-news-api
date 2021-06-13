@@ -7,6 +7,7 @@ This is an API to get the last news from Hacker News.
 4. Tests
 5. Cannot read property 'map' of null when going to a non existing page on HN.
 6. Better title site and comments Regex.
+7. Check Hacker News call limit (4?)
 
 # BONUS
 

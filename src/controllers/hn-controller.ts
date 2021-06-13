@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import crawler from '../crawler/index.js';
+import crawler from '../crawler';
 
 export async function getByPage(req: Request, res: Response) {
     const { page } = req.params;

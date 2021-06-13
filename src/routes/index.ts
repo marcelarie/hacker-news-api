@@ -1,3 +1,3 @@
-import HackerNewsRouter from './hn-routes.js';
+import HackerNewsRouter from './hn-routes';
 
 export { HackerNewsRouter}

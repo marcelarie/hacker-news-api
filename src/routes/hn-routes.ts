@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getByPage } from '../controllers/hn-controller.js';
+import { getByPage } from '../controllers/hn-controller';
 
 const HackerNewsRouter = Router();
 

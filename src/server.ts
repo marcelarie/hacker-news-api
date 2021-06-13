@@ -2,7 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 
-import { HackerNewsRouter } from './routes/index.js';
+import { HackerNewsRouter } from './routes';
 
 const app = express();
 
