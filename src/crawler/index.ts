@@ -34,9 +34,10 @@ function formatter(response: AxiosResponse, result: Object[] = []) {
     };
 
     let count = 0;
-    const allGeneralMatches = generalMatch.athings.map((item: string) => {
+    const allGeneralMatches = generalMatch.subtexts.map((item: string) => {
+        const match = item.concat(generalMatch.athings[count]);
         count++;
-        return item.concat(generalMatch.subtexts[count]);
+        return match;
     });
 
     const cleanResult = (post: PostType, key: string) => {
