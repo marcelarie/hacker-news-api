@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 
 type PostType = {
     [key: string]: string;
@@ -7,6 +7,33 @@ type PostType = {
 type RegexOnjectType = {
     [key: string]: RegExp;
 };
+
+function cleanResult(post: PostType, key: string) {
+    if (post[key].includes('NOT FOUND (´･_･`)')) return post[key];
+    switch (key) {
+        case 'rank':
+            post[key] = post[key].slice(1, -1);
+            break;
+        case 'author':
+            post[key] = post[key].slice(4, -2);
+            break;
+        case 'site':
+        case 'title':
+            post[key] = post[key].slice(1);
+            break;
+        case 'link':
+            post[key] = post[key].split('"')[0];
+            break;
+        case 'score':
+            post[key] = post[key].split('>')[1];
+            break;
+        case 'age':
+            post[key] = post[key].split('>')[2].slice(0, -3);
+            break;
+        default:
+            break;
+    }
+}
 
 // TODO: Modularize this function
 function formatter(data: string[], result: Object[] = []) {
@@ -22,49 +49,27 @@ function formatter(data: string[], result: Object[] = []) {
         rank: /<span class="rank"(.*?)<\/span>/, //✅
         author: /<a href="user(.*?)class="hnuser(.*?)<\/a>/,
         site: /<span class="sitestr"(.*?)<\/span>/, // ✅
-        title: /class="storylink"(.*?)<\/a>/, //✅
+        title: /class="storylink"(.*?)<\/a>/, //✅ // TODO: Fix this
         link: /<td class="title"><a href="(.*?)>/, //✅
         score: /<span class="score"(.*?)<\/span>/, //✅
         age: /<span class="age"(.*?)<\/span>/, //✅
         comments: /([0-9]|[1-9][0-9]|[1-9][0-9][0-9])&nbsp;comments/, // TODO: Fix this
     };
+
+    // Create two arrays of the 2 main containers from the html data
     const generalMatch = {
         athings: trimmedData.match(/<tr(.*?)class='athing'(.*?)<\/tr>/g)!,
         subtexts: trimmedData.match(/<td class=('|")subtext('|")(.*?)<\/td>/g)!,
     };
 
+    // New array with the content of each post from both athing ans subtexts
     const allGeneralMatches = generalMatch.subtexts.map(
         (item: string, index: number) =>
             item.concat(generalMatch.athings[index])
     );
 
-    const cleanResult = (post: PostType, key: string) => {
-        if (post[key].includes('NOT FOUND (´･_･`)')) return post[key];
-        switch (key) {
-            case 'rank':
-                post[key] = post[key].slice(1, -1);
-                break;
-            case 'author':
-                post[key] = post[key].slice(4, -2);
-                break;
-            case 'site':
-            case 'title':
-                post[key] = post[key].slice(1);
-                break;
-            case 'link':
-                post[key] = post[key].split('"')[0];
-                break;
-            case 'score':
-                post[key] = post[key].split('>')[1];
-                break;
-            case 'age':
-                post[key] = post[key].split('>')[2].slice(0, -3);
-                break;
-            default:
-                break;
-        }
-    };
-
+    // Generete a object, for each match, with the keys from the
+    // regularExpressions to push it in the result array
     allGeneralMatches.forEach((item: string) => {
         const post: PostType = {};
         for (const regex in regularExpressions) {
@@ -78,26 +83,31 @@ function formatter(data: string[], result: Object[] = []) {
     return result;
 }
 
+// Generete one data from multiple calls to Hacker News
+async function crawlerMultiCall(page: string, mode: string) {
+    const host = 'https://news.ycombinator.com/';
+
+    const urls = [];
+    let numberPages = parseInt(page);
+    if (numberPages >= 5)
+        throw new Error("Can't find this page at Hacker News");
+
+    for (let index = 0; index < numberPages; index++) {
+        urls.push(host + mode + (index + 1));
+    }
+
+    const responses = urls.map(async url => {
+        const response = await axios.get(url);
+        return response.data;
+    });
+
+    const data: string[] = await Promise.all(responses);
+    return data;
+}
+
 async function crawler(page = '1', mode = 'news?p=') {
     try {
-        const host = 'https://news.ycombinator.com/';
-
-        const urls = [];
-        let numberPages = parseInt(page);
-        if (numberPages >= 5)
-            throw new Error("Can't find this page at Hacker News");
-
-        for (let index = 0; index < numberPages; index++) {
-            urls.push(host + mode + (index + 1));
-        }
-
-        const responses = urls.map(async url => {
-            const response = await axios.get(url);
-            return response.data;
-        });
-
-        const data: string[] = await Promise.all(responses);
-
+        const data = await crawlerMultiCall(page, mode);
         const formatted = formatter(data);
 
         return formatted;
