@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { checkCachePages } from '../cache';
 import crawler from '../crawler';
 
 export async function getByPage(req: Request, res: Response) {
@@ -6,10 +7,12 @@ export async function getByPage(req: Request, res: Response) {
         let { page } = req.params;
         if (page === undefined) page = '1';
         let numberPages = parseInt(page);
-        if (numberPages >= 5 || !numberPages)
+
+        if (numberPages - checkCachePages() >= 5 || !numberPages)
             return res.status(404).send({
                 data: null,
-                message: "Can't find this page at Hacker News",
+                message:
+                    "Can't retrieve more than 4 pages at the same time from Hacker News",
             });
 
         const response = await crawler(page);

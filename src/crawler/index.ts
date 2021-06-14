@@ -1,4 +1,10 @@
 import axios from 'axios';
+import {
+    cache,
+    checkCachePages,
+    extractFromCache,
+    saveOnCache,
+} from '../cache';
 
 type PostType = {
     [key: string]: string;
@@ -35,7 +41,7 @@ function cleanResult(post: PostType, key: string) {
     }
 }
 
-function postsGeneretor(data: string[], result: Object[] = []) {
+function postsGeneretor(data: string[], pages = '1', result: Object[] = []) {
     const trimmedData = data.join('').replace(/(\r\n|\n|\r)/gm, '');
 
     const regexMatcher = (item: string, regex: RegExp, type = 'Type') => {
@@ -61,13 +67,17 @@ function postsGeneretor(data: string[], result: Object[] = []) {
         subtexts: trimmedData.match(/<td class=('|")subtext('|")(.*?)<\/td>/g)!,
     };
 
-    // New array with the content of each post from both athing ans subtexts
+    // New array with the content of each post from both athings ans subtexts
     const allGeneralMatches = generalMatch.subtexts.map(
         (item: string, index: number) =>
             item.concat(generalMatch.athings[index])
     );
 
-    // Generete a object, for each match, with the keys from the
+    if (checkCachePages() && checkCachePages() < parseInt(pages)) {
+        result = extractFromCache(checkCachePages());
+    }
+
+    // Generate a object, for each match, with the keys from the
     // regularExpressions to push it in the result array
     allGeneralMatches.forEach((item: string) => {
         const post: PostType = {};
@@ -79,34 +89,48 @@ function postsGeneretor(data: string[], result: Object[] = []) {
         result.push(post);
     });
 
+    if (checkCachePages() < parseInt(pages)) {
+        saveOnCache(result, parseInt(pages));
+    }
+
     return result;
 }
 
-// Generete one data from multiple calls to Hacker News
+// Generate one data from multiple calls to Hacker News
 async function crawlerMultiCall(page: string, mode: string) {
     const host = 'https://news.ycombinator.com/';
 
     const urls = [];
     let numberPages = parseInt(page);
-    for (let index = 0; index < numberPages; index++) {
+    for (let index = 0 + checkCachePages(); index < numberPages; index++) {
         urls.push(host + mode + (index + 1));
     }
+    console.log('Retrieving data from ' + urls);
 
-    const responses = urls.map(async url => {
+    if (urls.length > 0) {
+        const responses = urls.map(async url => {
+            // TODO: Handle errors
+            const response = await axios.get(url);
+            return response.data;
+        });
+
         // TODO: Handle errors
-        const response = await axios.get(url);
-        return response.data;
-    });
-
-    // TODO: Handle errors
-    const data: string[] = await axios.all(responses);
-    return data;
+        const data: string[] = await axios.all(responses);
+        return data;
+    } else {
+        return false;
+    }
 }
 
 async function crawler(page = '1', mode = 'news?p=') {
     try {
         const data = await crawlerMultiCall(page, mode);
-        const posts = postsGeneretor(data);
+
+        if (!data) {
+            return extractFromCache(parseInt(page));
+        }
+
+        const posts = postsGeneretor(data, page);
 
         return posts;
     } catch (error) {
