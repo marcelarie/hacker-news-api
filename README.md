@@ -4,7 +4,7 @@
 <img src="https://pbs.twimg.com/profile_images/469397708986269696/iUrYEOpJ_400x400.png" alt="api-logo" width='200px'/>
 </p>
 
-API to get the lastest news from Hacker News using a custom crawler.
+API to get the latest news from Hacker News using a custom crawler.
 
 ## Documentation
 
@@ -27,4 +27,3 @@ A local server will start on port 8080.
 > http://localhost:8080
 
 Enjoy!
-
