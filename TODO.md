@@ -1,9 +1,7 @@
 ### TODOS
 
-5. Cannot read property 'map' of null when going to a non existing page on HN. ✅
-6. Better title site and comments Regex.
-7. Check Hacker News call limit (4?)
-8. Error middleware
+6. Check Hacker News call limit (4?)
+7. Error middleware
 
 # BONUS
 
@@ -19,3 +17,5 @@
     - GET /2 -> page 1 and 2 of HN
 4. Tests
 5. Cache and call every 5m-10m
+6. Better title site and comments Regex.
+7. Cannot read property 'map' of null when going to a non existing page on HN. ✅

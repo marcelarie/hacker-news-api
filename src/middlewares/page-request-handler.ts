@@ -11,7 +11,7 @@ export async function pageRequestHandler(
         if (page === undefined) page = '1';
         let numberPages = parseInt(page);
 
-        const callLimit = 4;
+        const callLimit = 10;
         if (!numberPages) {
             return res.status(400).send({
                 data: null,

@@ -1,10 +1,5 @@
 import axios from 'axios';
-import {
-    cache,
-    checkCachePages,
-    extractFromCache,
-    saveOnCache,
-} from '../cache';
+import { checkCachePages, extractFromCache, saveOnCache } from '../cache';
 
 type PostType = {
     [key: string]: string;
@@ -54,7 +49,7 @@ function postsGeneretor(data: string[], pages = '1', result: Object[] = []) {
         rank: /<span class="rank"(.*?)<\/span>/, //✅
         author: /<a href="user(.*?)class="hnuser(.*?)<\/a>/,
         site: /<span class="sitestr"(.*?)<\/span>/, // ✅
-        title: /class="storylink"(.*?)<\/a>/, //✅ 
+        title: /class="storylink"(.*?)<\/a>/, //✅
         link: /<td class="title"><a href="(.*?)>/, //✅
         score: /<span class="score"(.*?)<\/span>/, //✅
         age: /<span class="age"(.*?)<\/span>/, //✅
@@ -114,7 +109,21 @@ async function crawlerMultiCall(page: string, mode: string) {
                 return response.data;
             });
 
-            const data: string[] = await axios.all(responses);
+            let data: string[] = [];
+            if (responses.length > 4) {
+                for (let index = 0; index < responses.length; index++) {
+                    setTimeout(async () => {
+                        const responsePack: string[] = await axios.all(
+                            responses.slice(index, index + 4)
+                        );
+                        data.push(...responsePack);
+                    }, 1000);
+                    index = index + 4;
+                }
+            } else {
+                data = await axios.all(responses);
+            }
+
             return data;
         } catch (error) {
             return error.message;
