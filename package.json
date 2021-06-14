@@ -5,8 +5,8 @@
     "repository": "git@github.com:marcelarie/hacker-news-api.git",
     "type": "module",
     "scripts": {
+        "build": "tsc",
         "start": "NODE_ENV=develop nodemon --experimental-specifier-resolution=node build/index.js",
-        "dev": "ts-node-dev build/index.js",
         "test": "NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js",
         "test:watch": "NODE_ENV=test node --experimental-vm-modules --experimental-specifier-resolution=node node_modules/jest/bin/jest.js --watchAll ./src"
     },

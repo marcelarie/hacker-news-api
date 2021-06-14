@@ -44,7 +44,7 @@ The root of the API returns the first page of Hacker News, that will be the top
 
     ... total of 30 news
 
-1.1 **Get multiple pages**
+1.2 **Get multiple pages**
 
 If we pass a number to the endpoint, for example `3`, the API will return the
 first 3 pages of Hacker News. That will be `90` news in order.
