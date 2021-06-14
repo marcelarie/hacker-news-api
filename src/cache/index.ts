@@ -21,4 +21,14 @@ function checkCachePages() {
     return cache.pages;
 }
 
-export { cache, saveOnCache, extractFromCache, checkCachePages };
+function cleanCache() {
+    setInterval(() => {
+        if (checkCachePages()) {
+            cache.data = [];
+            cache.pages = 0;
+            console.log('Cleared cache');
+        }
+    }, 300000);
+}
+
+export { cache, saveOnCache, extractFromCache, checkCachePages, cleanCache };

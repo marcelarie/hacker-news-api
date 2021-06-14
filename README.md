@@ -1,6 +1,6 @@
 # hacker-news-api
 
-This is an API to get the last news from Hacker News.
+API to get the lastest news from Hacker News.
 
 ### TODOS
 
@@ -13,7 +13,6 @@ This is an API to get the last news from Hacker News.
 
 1. Cache and call every 5m-10m
 2. Create more endpoints
-    - GET /1-5 -> page 1 to 5 of HN
     - GET /article/1 -> top 1 article at HN \*\*
 
 ### DONE
@@ -22,4 +21,4 @@ This is an API to get the last news from Hacker News.
 2. Process the data
 3. Create the endpoints
     - GET / -> page 1 of HN
-    - GET /2 -> page 2 of HN
+    - GET /2 -> page 1 and 2 of HN

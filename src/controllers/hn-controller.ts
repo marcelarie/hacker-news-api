@@ -8,11 +8,11 @@ export async function getByPage(req: Request, res: Response) {
         if (page === undefined) page = '1';
         let numberPages = parseInt(page);
 
-        if (numberPages - checkCachePages() >= 5 || !numberPages)
+        const callLimit = 4;
+        if (numberPages - checkCachePages() > callLimit || !numberPages)
             return res.status(404).send({
                 data: null,
-                message:
-                    "Can't retrieve more than 4 pages at the same time from Hacker News",
+                message: `Can't retrieve more than ${callLimit} pages at the same time from Hacker News`,
             });
 
         const response = await crawler(page);
