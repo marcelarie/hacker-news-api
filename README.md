@@ -1,24 +1,30 @@
 # hacker-news-api
 
-API to get the lastest news from Hacker News.
+<p align="center">
+<img src="https://pbs.twimg.com/profile_images/469397708986269696/iUrYEOpJ_400x400.png" alt="api-logo" width='200px'/>
+</p>
 
-### TODOS
+API to get the lastest news from Hacker News using a custom crawler.
 
-4. Tests
-5. Cannot read property 'map' of null when going to a non existing page on HN.
-6. Better title site and comments Regex.
-7. Check Hacker News call limit (4?)
+## Documentation
 
-# BONUS
+All the information about the endpoints [here](./DOCU.md)
 
-1. Cache and call every 5m-10m
-2. Create more endpoints
-    - GET /article/1 -> top 1 article at HN \*\*
+### Start here
 
-### DONE
+To run the project, open a terminal and execute the following command from project root path:
 
-1. Web crawler
-2. Process the data
-3. Create the endpoints
-    - GET / -> page 1 of HN
-    - GET /2 -> page 1 and 2 of HN
+Install dependencies
+
+> yarn
+
+Start a local server
+
+> yarn start
+
+A local server will start on port 8080.
+
+> http://localhost:8080
+
+Enjoy!
+
