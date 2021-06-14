@@ -1,20 +1,9 @@
 import { Request, Response } from 'express';
-import { checkCachePages } from '../cache';
 import crawler from '../crawler';
 
 export async function getByPage(req: Request, res: Response) {
     try {
-        let { page } = req.params;
-        if (page === undefined) page = '1';
-        let numberPages = parseInt(page);
-
-        const callLimit = 4;
-        if (numberPages - checkCachePages() > callLimit || !numberPages)
-            return res.status(404).send({
-                data: null,
-                message: `Can't retrieve more than ${callLimit} pages at the same time from Hacker News`,
-            });
-
+        const page = res.locals.page;
         const response = await crawler(page);
 
         if (!response) {
