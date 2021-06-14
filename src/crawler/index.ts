@@ -54,11 +54,11 @@ function postsGeneretor(data: string[], pages = '1', result: Object[] = []) {
         rank: /<span class="rank"(.*?)<\/span>/, //✅
         author: /<a href="user(.*?)class="hnuser(.*?)<\/a>/,
         site: /<span class="sitestr"(.*?)<\/span>/, // ✅
-        title: /class="storylink"(.*?)<\/a>/, //✅ // TODO: Fix this
+        title: /class="storylink"(.*?)<\/a>/, //✅ 
         link: /<td class="title"><a href="(.*?)>/, //✅
         score: /<span class="score"(.*?)<\/span>/, //✅
         age: /<span class="age"(.*?)<\/span>/, //✅
-        comments: /([0-9]|[1-9][0-9]|[1-9][0-9][0-9])&nbsp;comments/, // TODO: Fix this
+        comments: /([0-9]+)&nbsp;comment./, // ✅
     };
 
     // Create two arrays of the 2 main containers from the html data
@@ -108,15 +108,17 @@ async function crawlerMultiCall(page: string, mode: string) {
     console.log('Retrieving data from ' + urls);
 
     if (urls.length > 0) {
-        const responses = urls.map(async url => {
-            // TODO: Handle errors
-            const response = await axios.get(url);
-            return response.data;
-        });
+        try {
+            const responses = urls.map(async url => {
+                const response = await axios.get(url);
+                return response.data;
+            });
 
-        // TODO: Handle errors
-        const data: string[] = await axios.all(responses);
-        return data;
+            const data: string[] = await axios.all(responses);
+            return data;
+        } catch (error) {
+            return error.message;
+        }
     } else {
         return false;
     }
