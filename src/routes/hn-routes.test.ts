@@ -6,9 +6,9 @@ describe('Hacker News enpoints', () => {
         await request(app).get('/').expect('Content-Type', /json/).expect(200);
     });
     it('should return a message and status 404 for non existing pages', async () => {
-        const { body } = await request(app).get('/fdfsdsdg').expect(404);
+        const { body } = await request(app).get('/fdfsdsdg').expect(400);
 
-        expect(body.message).toBe("Can't find this page at Hacker News");
+        expect(body.message).toBe("Please use a number to request the pages from Hacker News.");
     });
 
     it('should return 30 for each page (example: page 2 == 60 news, 3 == 90...)', async () => {

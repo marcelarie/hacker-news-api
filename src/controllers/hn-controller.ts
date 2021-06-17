@@ -14,7 +14,6 @@ export async function getByPage(req: Request, res: Response) {
 
         return res.status(200).send(response);
     } catch ({ name, message }) {
-        console.log(name);
         res.status(500).send({ message });
     }
 }
